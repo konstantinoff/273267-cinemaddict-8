@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Андрей Константинов](https://up.htmlacademy.ru/ecmascript/8/user/273267).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Донецкий](https://htmlacademy.ru/profile/id497669).
 
 ---
 
