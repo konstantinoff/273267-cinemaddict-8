@@ -16,7 +16,7 @@ const render = () =>{
   navBar.insertAdjacentHTML(`afterbegin`, addFilter(`Favorites`, 8));
   navBar.insertAdjacentHTML(`afterbegin`, addFilter(`History`, 4));
   navBar.insertAdjacentHTML(`afterbegin`, addFilter(`Watchlist`, 13));
-  navBar.insertAdjacentHTML(`afterbegin`, addFilter(`All movies`, 25));
+  navBar.insertAdjacentHTML(`afterbegin`, addFilter(`All movies`, 21));
   renderCard(filmContainer);
   const filter = document.querySelectorAll(`.main-navigation__item`);
   extraFilms.forEach((element) => renderCard(element, 2));
