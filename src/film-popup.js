@@ -15,6 +15,8 @@ export default class GetPopUp {
     this._poster = poster;
     this._ageLimit = ageLimit;
   }
+
+
   get element() {
     return this._element;
   }

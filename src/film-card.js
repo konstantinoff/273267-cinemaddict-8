@@ -19,8 +19,7 @@ export default class GetFilmCard {
   }
   bind() {
     this._element.querySelector(`.film-card__comments`)
-      .addEventListener(`click`, this
-        ._onEditButtonClick.bind(this));
+      .addEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
   get template() {

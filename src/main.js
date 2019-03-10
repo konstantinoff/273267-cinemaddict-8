@@ -1,7 +1,7 @@
 import addFilter from "./navigation-template";
-import filmData from "./get-film-data";
-import FilmCardTemplate from "./film-card-template";
-import GetFilmPopUp from "./get-film-popup";
+import filmData from "./data";
+import FilmCardTemplate from "./film-card";
+import GetFilmPopUp from "./film-popup";
 
 const FAVORITES_AMOUNT = 8;
 const HISTORY_AMOUNT = 4;
@@ -13,7 +13,7 @@ const body = document.querySelector(`body`);
 const cardTemplate = new FilmCardTemplate(filmData);
 const popUpTemplate = new GetFilmPopUp(filmData);
 
-const rendering = () =>{
+const render = () => {
   filmContainer.appendChild(cardTemplate.render());
   cardTemplate.onClick = () => {
     popUpTemplate.render();
@@ -28,4 +28,4 @@ const rendering = () =>{
   navBar.insertAdjacentHTML(`afterbegin`, addFilter(`All movies`, ALL_MOVIES_AMOUNT));
 };
 
-rendering();
+render();
