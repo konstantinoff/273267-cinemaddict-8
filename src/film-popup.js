@@ -30,8 +30,7 @@ export default class GetPopUp {
 
   bind() {
     this._element.querySelector(`.film-details__close-btn`)
-      .addEventListener(`click`, this
-        ._onCloseButtonClick.bind(this));
+      .addEventListener(`click`, this._onCloseButtonClick.bind(this));
   }
 
 
