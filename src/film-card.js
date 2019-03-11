@@ -1,7 +1,8 @@
-import createElement from './create-element';
+import Component from './component';
 
-export default class GetFilmCard {
+export default class GetFilmCard extends Component {
   constructor({title, filmDescription, filmRange, filmMark, filmDate, genre, poster}) {
+    super();
     this._title = title;
     this._description = filmDescription;
     this._filmRange = filmRange;
@@ -9,6 +10,8 @@ export default class GetFilmCard {
     this._filmDate = filmDate;
     this._genre = genre;
     this._poster = poster;
+
+    this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
 
   _onEditButtonClick() {
@@ -19,7 +22,11 @@ export default class GetFilmCard {
   }
   bind() {
     this._element.querySelector(`.film-card__comments`)
-      .addEventListener(`click`, this._onEditButtonClick.bind(this));
+      .addEventListener(`click`, this._onEditButtonClick);
+  }
+  unbind() {
+    this._element.querySelector(`.film-card__comments`)
+      .removeEventListener(`click`, this._onEditButtonClick);
   }
 
   get template() {
@@ -44,11 +51,6 @@ export default class GetFilmCard {
             <button class="film-card__controls-item button film-card__controls-item--favorite"><!--Mark as favorite-->FAV</button>
           </form>
         </article>`;
-  }
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
   }
 }
 

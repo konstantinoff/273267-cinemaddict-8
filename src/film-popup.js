@@ -1,7 +1,8 @@
-import createElement from './create-element';
+import Component from './component.js';
 
-export default class GetPopUp {
+export default class GetPopUp extends Component {
   constructor({title, filmDescription, filmRange, filmMark, filmDate, genre, poster, ageLimit, actors, director, writers, country}) {
+    super();
     this._title = title;
     this._actors = actors;
     this._director = director;
@@ -14,6 +15,8 @@ export default class GetPopUp {
     this._genre = genre;
     this._poster = poster;
     this._ageLimit = ageLimit;
+
+    this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
   }
 
 
@@ -30,7 +33,11 @@ export default class GetPopUp {
 
   bind() {
     this._element.querySelector(`.film-details__close-btn`)
-      .addEventListener(`click`, this._onCloseButtonClick.bind(this));
+      .addEventListener(`click`, this._onCloseButtonClick);
+  }
+  unbind() {
+    this._element.querySelector(`.film-details__close-btn`)
+      .removeEventListener(`click`, this._onCloseButtonClick);
   }
 
 
@@ -200,11 +207,6 @@ export default class GetPopUp {
     </section>
   </form>
 </section>`;
-  }
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
   }
 }
 
