@@ -18,9 +18,12 @@ const render = () => {
   cardTemplate.onClick = () => {
     popUpTemplate.render();
     body.appendChild(popUpTemplate.element);
+    cardTemplate.unbind();
   };
   popUpTemplate.onClick = () => {
     body.removeChild(popUpTemplate.element);
+    popUpTemplate.unrender();
+    cardTemplate.bind();
   };
   navBar.insertAdjacentHTML(`afterbegin`, addFilter(`Favorites`, FAVORITES_AMOUNT));
   navBar.insertAdjacentHTML(`afterbegin`, addFilter(`History`, HISTORY_AMOUNT));
