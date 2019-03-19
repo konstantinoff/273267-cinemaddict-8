@@ -1,7 +1,8 @@
 import Component from './component';
+import moment from 'moment';
 
 export default class GetFilmCard extends Component {
-  constructor({title, filmDescription, filmRange, filmMark, filmDate, genre, poster}) {
+  constructor({title, filmDescription, filmRange, filmMark, filmDate, genre, poster, userComments}) {
     super();
     this._title = title;
     this._description = filmDescription;
@@ -10,8 +11,13 @@ export default class GetFilmCard extends Component {
     this._filmDate = filmDate;
     this._genre = genre;
     this._poster = poster;
+    this._userComments = userComments;
 
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
+  }
+
+  get element() {
+    return this._element;
   }
 
   _onEditButtonClick() {
@@ -29,21 +35,23 @@ export default class GetFilmCard extends Component {
       .removeEventListener(`click`, this._onEditButtonClick);
   }
 
+  update({userComments}) {
+    this._userComments = userComments;
+  }
+
   get template() {
-    const year = this._filmDate.getFullYear();
-    const filmHours = Math.floor((this._filmRange / 60));
-    const filmMinutes = this._filmRange % 60;
+    const filmRange = moment.duration(this._filmRange, `m`);
     return `<article class="film-card">
           <h3 class="film-card__title">${this._title}</h3>
           <p class="film-card__rating">${this._filmMark}</p>
           <p class="film-card__info">
-            <span class="film-card__year">${year}</span>
-            <span class="film-card__duration">${filmHours}h ${filmMinutes}m</span>
+            <span class="film-card__year">${moment(this._filmDate).year()}</span>
+            <span class="film-card__duration">${filmRange.hours()}h ${filmRange.minutes()}m</span>
             <span class="film-card__genre">${this._genre[0]}</span>
           </p>
           <img src="${this._poster}" alt="" class="film-card__poster">
           <p class="film-card__description">${this._description.join(`. `)}</p>
-          <button class="film-card__comments">13 comments</button>
+          <button class="film-card__comments">${this._userComments.length} comments</button>
 
           <form class="film-card__controls">
             <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist"><!--Add to watchlist--> WL</button>

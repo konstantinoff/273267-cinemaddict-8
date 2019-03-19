@@ -90,6 +90,8 @@ const task = () => ({
     18,
     21,
     62]), AGE_LIMIT_AMOUNT),
+  userRating: 5,
+  userComments: [[1553020868907, `privet`]],
 });
 
 

@@ -1,3 +1,5 @@
+
+
 export default class Component {
   constructor() {
     if (new.target === Component) {

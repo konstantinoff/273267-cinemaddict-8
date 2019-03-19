@@ -14,17 +14,33 @@ const cardTemplate = new FilmCardTemplate(filmData);
 const popUpTemplate = new GetFilmPopUp(filmData);
 
 const render = () => {
-  filmContainer.appendChild(cardTemplate.render());
+  cardTemplate.render();
+  filmContainer.appendChild(cardTemplate.element);
   cardTemplate.onClick = () => {
     popUpTemplate.render();
+
     body.appendChild(popUpTemplate.element);
     cardTemplate.unbind();
   };
+  popUpTemplate.onSubmit = (newData) => {
+    filmData.userRating = newData.userRating;
+    filmData.userComments = newData.userComments;
+    cardTemplate.update(filmData);
+    popUpTemplate.update(filmData);
+
+
+    let oldCard = cardTemplate.element;
+    cardTemplate.render();
+    cardTemplate.bind();
+    filmContainer.replaceChild(cardTemplate.element, oldCard);
+    popUpTemplate.unrender();
+  };
+
   popUpTemplate.onClick = () => {
-    body.removeChild(popUpTemplate.element);
     popUpTemplate.unrender();
     cardTemplate.bind();
   };
+
   navBar.insertAdjacentHTML(`afterbegin`, addFilter(`Favorites`, FAVORITES_AMOUNT));
   navBar.insertAdjacentHTML(`afterbegin`, addFilter(`History`, HISTORY_AMOUNT));
   navBar.insertAdjacentHTML(`afterbegin`, addFilter(`Watchlist`, WATCHLIST_AMOUNT));
