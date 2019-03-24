@@ -34,8 +34,8 @@ export default class Statistic extends Component {
               size: 20
             },
             color: `#ffffff`,
-            anchor: 'start',
-            align: 'start',
+            anchor: `start`,
+            align: `start`,
             offset: 40,
           }
         },
@@ -119,7 +119,7 @@ export default class Statistic extends Component {
   <ul class="statistic__text-list">
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">You watched</h4>
-      <p class="statistic__item-text">${this._watched} <span class="statistic__item-description">movies</span></p>
+      <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
