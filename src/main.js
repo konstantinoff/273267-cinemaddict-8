@@ -1,50 +1,106 @@
-import addFilter from "./navigation-template";
 import filmData from "./data";
 import FilmCardTemplate from "./film-card";
 import GetFilmPopUp from "./film-popup";
+import Filter from './filter';
+import Statistic from './statistic';
 
-const FAVORITES_AMOUNT = 8;
-const HISTORY_AMOUNT = 4;
-const WATCHLIST_AMOUNT = 13;
-const ALL_MOVIES_AMOUNT = 21;
 const navBar = document.querySelector(`.main-navigation`);
 const filmContainer = document.querySelector(`.films-list__container`);
+const filters = [[`All movies`, 5], [`Watchlist`, 6], [`History`, 7], [`Favorites`, 8]].reverse();
+
+
 const body = document.querySelector(`body`);
-const cardTemplate = new FilmCardTemplate(filmData);
-const popUpTemplate = new GetFilmPopUp(filmData);
+const updateCards = (cards, cardToUpdate, newCard) => {
+  const index = cards.findIndex((it) => it === cardToUpdate);
+  cards[index] = Object.assign({}, cardToUpdate, newCard);
+  return cards[index];
+
+};
+const filterCards = (filterName) => {
+  switch (filterName) {
+    case `All movies`:
+      return filmData;
+
+    case `Watchlist`:
+      return filmData.filter((it) => it.watchList === true);
+
+    case `History`:
+      return filmData.filter((it) => it.watched === true);
+    default:
+      return filmData;
+  }
+};
+
 
 const render = () => {
-  cardTemplate.render();
-  filmContainer.appendChild(cardTemplate.element);
-  cardTemplate.onClick = () => {
-    popUpTemplate.render();
-
-    body.appendChild(popUpTemplate.element);
-    cardTemplate.unbind();
-  };
-  popUpTemplate.onSubmit = (newData) => {
-    filmData.userRating = newData.userRating;
-    filmData.userComments = newData.userComments;
-    cardTemplate.update(filmData);
-    popUpTemplate.update(filmData);
-
-
-    let oldCard = cardTemplate.element;
-    cardTemplate.render();
-    cardTemplate.bind();
-    filmContainer.replaceChild(cardTemplate.element, oldCard);
-    popUpTemplate.unrender();
+  const statistic = new Statistic(filmData);
+  statistic.bind();
+  statistic.onStatisticRender = () => {
+    filmContainer.innerHTML = ``;
+    statistic.render();
+    filmContainer.appendChild(statistic.element);
+    statistic.statisticDraw();
   };
 
-  popUpTemplate.onClick = () => {
-    popUpTemplate.unrender();
-    cardTemplate.bind();
+  const renderFilters = (filterList) => {
+    for (let filter of filterList) {
+      const filterTemplate = new Filter(filter);
+      filterTemplate.render();
+      navBar.insertAdjacentElement(`afterbegin`, filterTemplate.element);
+      filterTemplate.onFilter = () => {
+        const filteredCards = filterCards(filter[0]);
+        renderCards(filteredCards);
+      };
+    }
   };
+  const renderCards = (cards) => {
+    filmContainer.innerHTML = ``;
+    for (let card of cards) {
+      const cardTemplate = new FilmCardTemplate(card);
+      const popUpTemplate = new GetFilmPopUp(card);
 
-  navBar.insertAdjacentHTML(`afterbegin`, addFilter(`Favorites`, FAVORITES_AMOUNT));
-  navBar.insertAdjacentHTML(`afterbegin`, addFilter(`History`, HISTORY_AMOUNT));
-  navBar.insertAdjacentHTML(`afterbegin`, addFilter(`Watchlist`, WATCHLIST_AMOUNT));
-  navBar.insertAdjacentHTML(`afterbegin`, addFilter(`All movies`, ALL_MOVIES_AMOUNT));
+
+      cardTemplate.render();
+      filmContainer.appendChild(cardTemplate.element);
+      cardTemplate.onClick = () => {
+        popUpTemplate.render();
+        body.appendChild(popUpTemplate.element);
+        cardTemplate.unbind();
+      };
+
+      cardTemplate.onAddToWatchList = () => {
+        card.watchList = !card.watchList;
+        const updateCard = updateCards(cards, card);
+        cardTemplate.update(updateCard);
+      };
+
+      cardTemplate.onMarkAsWatched = () => {
+        card.watched = !card.watched;
+        const updateCard = updateCards(cards, card);
+        cardTemplate.update(updateCard);
+      };
+
+
+      popUpTemplate.onSubmit = (newData) => {
+        const updateCard = updateCards(cards, card, newData);
+        cardTemplate.update(updateCard);
+
+
+        let oldCard = cardTemplate.element;
+        cardTemplate.render();
+        cardTemplate.bind();
+        filmContainer.replaceChild(cardTemplate.element, oldCard);
+        popUpTemplate.unrender();
+      };
+
+      popUpTemplate.onClick = () => {
+        popUpTemplate.unrender();
+        cardTemplate.bind();
+      };
+    }
+  };
+  renderFilters(filters);
+  renderCards(filmData);
 };
 
 render();

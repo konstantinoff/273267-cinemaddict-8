@@ -1,8 +1,14 @@
 import Component from './component.js';
 import moment from 'moment';
 
+const EmojiMap = {
+  'grinning': `😀`,
+  'neutral-face': `😐`,
+  'sleeping': `😴`
+};
+
 export default class GetPopUp extends Component {
-  constructor({title, filmDescription, filmRange, filmMark, filmDate, genre, poster, ageLimit, actors, director, writers, country, userComments, userRating}) {
+  constructor({title, filmDescription, filmRange, filmMark, filmDate, genre, poster, ageLimit, actors, director, writers, country, userComments, userRating, watchList, watched}) {
     super();
     this._title = title;
     this._actors = actors;
@@ -18,6 +24,8 @@ export default class GetPopUp extends Component {
     this._ageLimit = ageLimit;
     this._userComments = userComments;
     this._userRating = userRating;
+    this._watchList = watchList;
+    this._wached = watched;
 
     this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
     this._onSubmitClick = this._onSubmitClick.bind(this);
@@ -37,12 +45,32 @@ export default class GetPopUp extends Component {
   }
 
   static createMapper(target) {
+    this._comment = undefined;
     return {
-      score: (value) => (target.userRating = +value),
-      comment: (value) => (target.userComments.push([moment().valueOf(), value]))
+      'score': (value) => (target.userRating = +value),
+      'comment': (value) => {
+        if (this._comment) {
+          let [date, comment, emoji] = this._comment;
+          comment = value;
+          target.userComments.push([date, comment, emoji]);
+        } else {
+          this._comment = [moment().valueOf(), value, undefined];
+        }
+      },
+      'comment-emoji': (value) => {
+        if (this._comment) {
+          let [date, comment, emoji] = this._comment;
+          emoji = value;
+          target.userComments.push([date, comment, emoji]);
+        } else {
+          this._comment = [moment().valueOf(), undefined, value];
+        }
+      }
     };
   }
-  update({userComments, userRating}) {
+  update({userComments, userRating, watchList, watched}) {
+    this._watchList = watchList;
+    this._wached = watched;
     this._userComments = userComments;
     this._userRating = userRating;
   }
@@ -64,6 +92,7 @@ export default class GetPopUp extends Component {
       this.update(newData);
     }
   }
+
 
   set onSubmit(fn) {
     this._onSubmit = fn;
@@ -168,10 +197,10 @@ export default class GetPopUp extends Component {
 
       <ul class="film-details__comments-list">
       ${this._userComments.map((comment) => {
-    const [date, text] = comment;
+    const [date, text, emoji] = comment;
     return `
     <li class="film-details__comment">
-        <span class="film-details__comment-emoji">😴</span>
+        <span class="film-details__comment-emoji">${EmojiMap[emoji]}</span>
       <div>
       <p class="film-details__comment-text">${text}</p>
       <p class="film-details__comment-info">

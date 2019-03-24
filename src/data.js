@@ -6,15 +6,19 @@ const COUNTRIES_AMOUNT = 1;
 const ACTORS_AMOUNT = 3;
 const GENRE_AMOUNT = 3;
 const YEARS_RANGE = -50;
+const FILM_CARDS_AMOUNT = 7;
 const postersArray = [`accused`, `blackmail`, `blue-blazes`, `fuga-da-new-york`, `moonrise`, `three-friends`];
 const description = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`.split(`. `);
-const getRandomArrayElements = (array, elementsAmount) => Array.from(array).sort(() => 0.5 - Math.random()).slice(0, elementsAmount);
+const getRandomArrayElements = (array, elementsAmount) => {
+  const randArray = Array.from(array).sort(() => 0.5 - Math.random()).slice(0, elementsAmount);
+  return (randArray.length === 1) ? randArray[0] : randArray;
+};
 const getRandomTimestamp = () => new Date(Date.now() + 1 + Math.floor(Math.random() * YEARS_RANGE) * 12 * 30 * 24 * 60 * 60 * 1000);
 const getRandomMark = () => (Math.random() * 10).toFixed(1);
 const getRandomFilmRange = () => Math.floor(Math.random() * 180) + 60;
 
 
-const task = () => ({
+const randomData = () => ({
   title: getRandomArrayElements([
     `Побег из Шоушенка`,
     `Зеленая миля`,
@@ -91,8 +95,17 @@ const task = () => ({
     21,
     62]), AGE_LIMIT_AMOUNT),
   userRating: 5,
-  userComments: [[1553020868907, `privet`]],
+  userComments: [[1553020868907, `privet`, `sleeping`]],
+  watchList: false,
+  watched: false
 });
 
+const createCardsData = () => {
+  const cardsList = [];
+  for (let i = 0; i < FILM_CARDS_AMOUNT; i++) {
+    cardsList.push(randomData());
+  }
+  return cardsList;
+};
 
-export default task();
+export default createCardsData();

@@ -2,7 +2,7 @@ import Component from './component';
 import moment from 'moment';
 
 export default class GetFilmCard extends Component {
-  constructor({title, filmDescription, filmRange, filmMark, filmDate, genre, poster, userComments}) {
+  constructor({title, filmDescription, filmRange, filmMark, filmDate, genre, poster, userComments, watchList, watched}) {
     super();
     this._title = title;
     this._description = filmDescription;
@@ -12,30 +12,60 @@ export default class GetFilmCard extends Component {
     this._genre = genre;
     this._poster = poster;
     this._userComments = userComments;
+    this._watchList = watchList;
+    this._wached = watched;
 
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
-  }
-
-  get element() {
-    return this._element;
+    this._onAddToWatchListButtonClick = this._onAddToWatchListButtonClick.bind(this);
+    this._onMarkAsWatchedButtonClick = this._onMarkAsWatchedButtonClick.bind(this);
   }
 
   _onEditButtonClick() {
     return typeof this._onClick === `function` && this._onClick();
   }
+
+  _onAddToWatchListButtonClick(e) {
+    e.preventDefault();
+    return typeof this._onAddToWatchList === `function` && this._onAddToWatchList();
+  }
+
+  _onMarkAsWatchedButtonClick(e) {
+    e.preventDefault();
+    return typeof this._onMarkAsWatched === `function` && this._onMarkAsWatched();
+  }
+
   set onClick(fn) {
     this._onClick = fn;
   }
+
+  set onAddToWatchList(fn) {
+    this._onAddToWatchList = fn;
+  }
+
+  set onMarkAsWatched(fn) {
+    this._onMarkAsWatched = fn;
+  }
+
   bind() {
     this._element.querySelector(`.film-card__comments`)
       .addEventListener(`click`, this._onEditButtonClick);
+    this._element.querySelector(`.film-card__controls-item--add-to-watchlist`)
+      .addEventListener(`click`, this._onAddToWatchListButtonClick);
+    this._element.querySelector(`.film-card__controls-item--mark-as-watched`)
+      .addEventListener(`click`, this._onMarkAsWatchedButtonClick);
   }
   unbind() {
     this._element.querySelector(`.film-card__comments`)
       .removeEventListener(`click`, this._onEditButtonClick);
+    this._element.querySelector(`.film-card__controls-item--add-to-watchlist`)
+      .removeEventListener(`click`, this._onAddToWatchListButtonClick);
+    this._element.querySelector(`.film-card__controls-item--mark-as-watched`)
+      .removeEventListener(`click`, this._onMarkAsWatchedButtonClick);
   }
 
-  update({userComments}) {
+  update({userComments, watchList, watched}) {
+    this._watchList = watchList;
+    this._wached = watched;
     this._userComments = userComments;
   }
 
@@ -51,7 +81,7 @@ export default class GetFilmCard extends Component {
           </p>
           <img src="${this._poster}" alt="" class="film-card__poster">
           <p class="film-card__description">${this._description.join(`. `)}</p>
-          <button class="film-card__comments">${this._userComments.length} comments</button>
+          <button class="film-card__comments">${this._userComments.length} comments</button> 
 
           <form class="film-card__controls">
             <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist"><!--Add to watchlist--> WL</button>
