@@ -72,12 +72,14 @@ const render = () => {
         card.watchList = !card.watchList;
         const updateCard = updateCards(cards, card);
         cardTemplate.update(updateCard);
+        statistic.update(filmData);
       };
 
       cardTemplate.onMarkAsWatched = () => {
         card.watched = !card.watched;
         const updateCard = updateCards(cards, card);
         cardTemplate.update(updateCard);
+        statistic.update(filmData);
       };
 
 

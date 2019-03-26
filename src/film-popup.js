@@ -211,7 +211,7 @@ export default class GetPopUp extends Component {
       </li>
       `;
   }
-  )}
+  ).join(``)}
 
       </ul>
 

@@ -1,5 +1,4 @@
 import Component from './component';
-import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -7,10 +6,20 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 export default class Statistic extends Component {
   constructor(data) {
     super();
-    this._watched = data.title;
+    this._watched = data.filter((it) => it.watched === true);
+    this._duration = this._watched.reduce((acc, film) => acc + film.filmRange, 0);
+    const allGenres = this._watched.reduce((acc, film) => acc.concat(film.genre), []);
+    const topGenre = allGenres.reduce((acc, item) => {
+      if (acc[item]) {
+        acc[item]++;
+      } else {
+        acc[item] = 1;
+      }
+      return acc;
+    }, {});
+    this._genresSorted = Object.entries(topGenre).sort((a, b) => b[1] - a[1]);
     this._onStatisticRender = this._onStatisticRender.bind(this);
   }
-
   statisticDraw() {
     const statisticCtx = document.querySelector(`.statistic__chart`);
     const BAR_HEIGHT = 50;
@@ -19,9 +28,9 @@ export default class Statistic extends Component {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {
-        labels: [`Sci-Fi`, `Animation`, `Fantasy`, `Comedy`, `TV Series`],
+        labels: this._genresSorted.map((it) => it[0]),
         datasets: [{
-          data: [11, 8, 7, 4, 3],
+          data: this._genresSorted.map((it) => it[1]),
           backgroundColor: `#ffe800`,
           hoverBackgroundColor: `#ffe800`,
           anchor: `start`
@@ -71,6 +80,7 @@ export default class Statistic extends Component {
         }
       }
     });
+    return myChart;
   }
 
   set onStatisticRender(fn) {
@@ -90,6 +100,21 @@ export default class Statistic extends Component {
   unbind() {
     document.querySelector(`.main-navigation__item--additional`)
       .removeEventListener(`click`, this._onStatisticRender);
+  }
+
+  update(data) {
+    this._watched = data.filter((it) => it.watched === true);
+    this._duration = this._watched.reduce((acc, film) => acc + film.filmRange, 0);
+    const allGenres = this._watched.reduce((acc, film) => acc.concat(film.genre), []);
+    const topGenre = allGenres.reduce((acc, item) => {
+      if (acc[item]) {
+        acc[item]++;
+      } else {
+        acc[item] = 1;
+      }
+      return acc;
+    }, {});
+    this._genresSorted = Object.entries(topGenre).sort((a, b) => b[1] - a[1]);
   }
 
 
@@ -119,15 +144,15 @@ export default class Statistic extends Component {
   <ul class="statistic__text-list">
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">You watched</h4>
-      <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+      <p class="statistic__item-text">${this._watched.length} <span class="statistic__item-description">movies</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
+      <p class="statistic__item-text">${Math.floor(this._duration / 60)} <span class="statistic__item-description">h</span> ${this._duration % 60} <span class="statistic__item-description">m</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>
-      <p class="statistic__item-text">Sci-Fi</p>
+      <p class="statistic__item-text">${this._genresSorted[0][0]}</p>
     </li>
   </ul>
 
