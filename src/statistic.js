@@ -152,7 +152,7 @@ export default class Statistic extends Component {
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>
-      <p class="statistic__item-text">${this._genresSorted[0][0]}</p>
+      <p class="statistic__item-text">${this._genresSorted.length ? this._genresSorted[0][0] : ``}</p>
     </li>
   </ul>
 
