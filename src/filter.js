@@ -28,6 +28,6 @@ export default class Filter extends Component {
 
 
   get template() {
-    return `<a href="#" class="main-navigation__item">${this._filterName} <span class="main-navigation__item-count">${this._filterAmount}</span></a>`;
+    return `<a href="#" class="main-navigation__item">${this._filterName} ${this._filterName !== `All movies` ? (`<span class="main-navigation__item-count">${this._filterAmount}</span>`) : ``}</a>`;
   }
 }

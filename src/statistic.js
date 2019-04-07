@@ -6,8 +6,8 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 export default class Statistic extends Component {
   constructor(data) {
     super();
-    this._watched = data.filter((it) => it.watched === true);
-    this._duration = this._watched.reduce((acc, film) => acc + film.filmRange, 0);
+    this._watched = data.filter((it) => it.alreadyWatched === true);
+    this._duration = this._watched.reduce((acc, film) => acc + film.runtime, 0);
     const allGenres = this._watched.reduce((acc, film) => acc.concat(film.genre), []);
     const topGenre = allGenres.reduce((acc, item) => {
       if (acc[item]) {
@@ -103,8 +103,8 @@ export default class Statistic extends Component {
   }
 
   update(data) {
-    this._watched = data.filter((it) => it.watched === true);
-    this._duration = this._watched.reduce((acc, film) => acc + film.filmRange, 0);
+    this._watched = data.filter((it) => it.alreadyWatched === true);
+    this._duration = this._watched.reduce((acc, film) => acc + film.runtime, 0);
     const allGenres = this._watched.reduce((acc, film) => acc.concat(film.genre), []);
     const topGenre = allGenres.reduce((acc, item) => {
       if (acc[item]) {
