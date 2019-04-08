@@ -99,9 +99,9 @@ export default class GetPopUp extends Component {
       const formData = new FormData(this._element.querySelector(`.film-details__inner`));
       const newData = this._processForm(formData);
       if (typeof this._onSubmit === `function`) {
+        this.update(newData);
         this._onSubmit(newData);
       }
-      this.update(newData);
     }
   }
 

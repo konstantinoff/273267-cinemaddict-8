@@ -56,6 +56,14 @@ export default class GetFilmCard extends Component {
     this._onAddToFavorite = fn;
   }
 
+  update({userComments, personalRating, alreadyWatched, watchlist, favorite}) {
+    this._watchlist = watchlist;
+    this._favorite = favorite;
+    this._alreadyWatched = alreadyWatched;
+    this._personalRating = personalRating;
+    this._userComments = userComments;
+  }
+
   bind() {
     this._element.querySelector(`.film-card__comments`)
       .addEventListener(`click`, this._onEditButtonClick);

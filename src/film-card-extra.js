@@ -32,10 +32,6 @@ export default class ExtraGetFilmCard extends Component {
       .removeEventListener(`click`, this._onEditButtonClick);
   }
 
-  update({userComments}) {
-    this._userComments = userComments;
-  }
-
   get template() {
     const filmRange = moment.duration(this._filmRange, `m`);
     return `<article class="film-card">

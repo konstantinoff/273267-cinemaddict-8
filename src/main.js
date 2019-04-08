@@ -4,6 +4,7 @@ import GetFilmPopUp from "./film-popup";
 import Filter from './filter';
 import Statistic from './statistic';
 import API from './api';
+import Search from './search';
 import ExtraFilmCardTemplate from './film-card-extra';
 
 let cardToRenderPosition = 5;
@@ -11,12 +12,13 @@ let dataToRender;
 
 const showMoreButton = document.querySelector(`.films-list__show-more`);
 const navBar = document.querySelector(`.main-navigation`);
+const searchForm = document.querySelector(`.header__search`);
 const filmsContainer = document.querySelector(`.films-list__container`);
 const topRatedContainer = document.querySelectorAll(`.films-list--extra .films-list__container`)[0];
 const mostCommendedContainer = document.querySelectorAll(`.films-list--extra .films-list__container`)[1];
 
 
-const AUTHORIZATION = `Basic eo0w590ik29889a239j981`;
+const AUTHORIZATION = `Basic eo0w590ik29889a239j98232`;
 const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
@@ -41,6 +43,13 @@ const filterCards = (filterName, store) => {
   }
 };
 
+const searchCards = (data, value) => {
+  if (value === ``) {
+    return data;
+  }
+  return data.filter((it) => it.title.toUpperCase().includes(value.toUpperCase()));
+};
+
 
 const render = () => {
   api.getCards()
@@ -50,6 +59,7 @@ const render = () => {
       showMoreCards(dataToRender);
       renderExtraCards(filmData.data);
       renderFilters(filmData.data);
+      cardToRenderPosition = 5;
       showMoreButton.addEventListener(`click`, onShowMoreButtonClick);
     });
 
@@ -64,6 +74,21 @@ const render = () => {
     cardToRenderPosition += 5;
   };
 
+  const renderSearch = () => {
+    const formElement = new Search();
+    formElement.render();
+    searchForm.appendChild(formElement.element);
+    formElement.onSearch = () => {
+      const searchValue = formElement.element.value;
+      if (searchValue !== ``) {
+        const searchResult = searchCards(filmData.data, searchValue);
+        renderCards(searchResult);
+      } else {
+        cardToRenderPosition = 5;
+        showMoreCards(filmData.data);
+      }
+    };
+  };
 
   const renderFilters = (data) => {
     navBar.innerHTML = `<a href="#stats" class="main-navigation__item main-navigation__item--additional">Stats</a>`;
@@ -136,10 +161,10 @@ const render = () => {
       };
 
 
-      popUpTemplate.onSubmit = () => {
+      popUpTemplate.onSubmit = (newData) => {
+        Object.assign(card, newData);
         api.updateCard({id: card.id, data: card.toRAW()})
           .then(() => {
-            console.log(`raw`, card.toRAW());
             let oldCard = cardTemplate.element;
             popUpTemplate.unrender();
             cardTemplate.render();
@@ -224,6 +249,7 @@ const render = () => {
       };
     }
   };
+  renderSearch();
 };
 
 render();
