@@ -6,9 +6,12 @@ import Statistic from './statistic';
 import API from './api';
 import Search from './search';
 import ExtraFilmCardTemplate from './film-card-extra';
+import footerStatistic from './footer-statistic';
+import profileRating from './profile-rating';
 
 let cardToRenderPosition = 5;
 let dataToRender;
+let isOpenedPopUp = false;
 
 const showMoreButton = document.querySelector(`.films-list__show-more`);
 const navBar = document.querySelector(`.main-navigation`);
@@ -18,7 +21,7 @@ const topRatedContainer = document.querySelectorAll(`.films-list--extra .films-l
 const mostCommendedContainer = document.querySelectorAll(`.films-list--extra .films-list__container`)[1];
 
 
-const AUTHORIZATION = `Basic eo0w590ik29889a239j98232`;
+const AUTHORIZATION = `Basic eo0w590ik29889a239j11114`;
 const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
@@ -43,12 +46,7 @@ const filterCards = (filterName, store) => {
   }
 };
 
-const searchCards = (data, value) => {
-  if (value === ``) {
-    return data;
-  }
-  return data.filter((it) => it.title.toUpperCase().includes(value.toUpperCase()));
-};
+const getSearchedData = (data, value) => data.filter((it) => it.title.toUpperCase().includes(value.toUpperCase()));
 
 
 const render = () => {
@@ -59,7 +57,8 @@ const render = () => {
       showMoreCards(dataToRender);
       renderExtraCards(filmData.data);
       renderFilters(filmData.data);
-      cardToRenderPosition = 5;
+      footerStatistic(filmData.data);
+      profileRating(filmData.data);
       showMoreButton.addEventListener(`click`, onShowMoreButtonClick);
     });
 
@@ -81,7 +80,7 @@ const render = () => {
     formElement.onSearch = () => {
       const searchValue = formElement.element.value;
       if (searchValue !== ``) {
-        const searchResult = searchCards(filmData.data, searchValue);
+        const searchResult = getSearchedData(filmData.data, searchValue);
         renderCards(searchResult);
       } else {
         cardToRenderPosition = 5;
@@ -130,8 +129,12 @@ const render = () => {
       filmsContainer.appendChild(cardTemplate.element);
       cardTemplate.onClick = () => {
         popUpTemplate.render();
-        body.appendChild(popUpTemplate.element);
-        cardTemplate.unbind();
+        if (isOpenedPopUp) {
+          body.replaceChild(popUpTemplate.element, isOpenedPopUp);
+        } else {
+          isOpenedPopUp = popUpTemplate.element;
+          body.appendChild(popUpTemplate.element);
+        }
       };
 
       cardTemplate.onAddToWatchList = () => {
@@ -163,18 +166,22 @@ const render = () => {
 
       popUpTemplate.onSubmit = (newData) => {
         Object.assign(card, newData);
+        console.log('disabled');
         api.updateCard({id: card.id, data: card.toRAW()})
-          .then(() => {
+          .then((data) => {
+            popUpTemplate._renderCommentsList(data.userComments);
             let oldCard = cardTemplate.element;
-            popUpTemplate.unrender();
             cardTemplate.render();
             cardTemplate.bind();
             filmsContainer.replaceChild(cardTemplate.element, oldCard);
-          });
+          })
+          .finally(() => {
+            console.log('undisabled');
+        });
       };
       popUpTemplate.onClose = () => {
         popUpTemplate.unrender();
-        cardTemplate.bind();
+        isOpenedPopUp = false;
       };
     }
   };
@@ -198,22 +205,20 @@ const render = () => {
         cardTemplate.unbind();
       };
 
-      popUpTemplate.onSubmit = () => {
+      popUpTemplate.onSubmit = (newData) => {
+        Object.assign(card, newData);
         api.updateCard({id: card.id, data: card.toRAW()})
-          .then((newCard) => {
-            cardTemplate.update(newCard);
+          .then((store) => {
+            popUpTemplate._renderCommentsList(store.userComments);
             let oldCard = cardTemplate.element;
-            popUpTemplate.unrender();
             cardTemplate.render();
             cardTemplate.bind();
-            topRatedContainer.replaceChild(cardTemplate.element, oldCard);
-            cardToRenderPosition = 5;
-            showMoreCards(filmData.data);
+            filmsContainer.replaceChild(cardTemplate.element, oldCard);
           });
       };
-      popUpTemplate.onClick = () => {
+      popUpTemplate.onClose = () => {
         popUpTemplate.unrender();
-        cardTemplate.bind();
+        isOpenedPopUp = false;
       };
     }
 
@@ -230,22 +235,20 @@ const render = () => {
         cardTemplate.unbind();
       };
 
-      popUpTemplate.onSubmit = () => {
+      popUpTemplate.onSubmit = (newData) => {
+        Object.assign(card, newData);
         api.updateCard({id: card.id, data: card.toRAW()})
-          .then((newCard) => {
-            cardTemplate.update(newCard);
+          .then((store) => {
+            popUpTemplate._renderCommentsList(store.userComments);
             let oldCard = cardTemplate.element;
-            popUpTemplate.unrender();
             cardTemplate.render();
             cardTemplate.bind();
-            mostCommendedContainer.replaceChild(cardTemplate.element, oldCard);
-            cardToRenderPosition = 5;
-            showMoreCards(filmData.data);
+            filmsContainer.replaceChild(cardTemplate.element, oldCard);
           });
       };
-      popUpTemplate.onClick = () => {
+      popUpTemplate.onClose = () => {
         popUpTemplate.unrender();
-        cardTemplate.bind();
+        isOpenedPopUp = false;
       };
     }
   };

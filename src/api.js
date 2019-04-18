@@ -53,7 +53,7 @@ export default class API {
       .then(ModelCards.parseCard);
   }
   deleteCard({id}) {
-    return this._load({url: `cards/${id}`, method: Method.DELETE});
+    return this._load({url: `cards/${id}`, method: Method.PUT});
   }
 
 

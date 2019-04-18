@@ -31,9 +31,49 @@ export default class GetPopUp extends Component {
 
 
     this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
+    this._deleteLastComment = this._deleteLastComment.bind(this);
     this._onSubmitClick = this._onSubmitClick.bind(this);
   }
-  _processForm(formData) {
+
+  render() {
+    this._element = Component.createElement(this.template);
+    this.bind();
+    this._renderCommentsList();
+    return this._element;
+  }
+
+  _deleteLastComment() {
+    this._userComments.splice(-1, 1);
+    console.log(this._userComments);
+    const formData = new FormData(this._element.querySelector(`.film-details__inner`));
+    const newData = this._processForm(formData, 'delete');
+    if (typeof this._onSubmit === `function`) {
+      this.update(newData);
+      this._onSubmit(newData);
+    }
+  }
+
+  _renderCommentsList(comments = this._userComments) {
+    const html = comments.map((comment) => {
+      return `
+  <li class="film-details__comment">
+    <span class="film-details__comment-emoji">${EmojiMap[comment.emotion]}</span>
+      <div>
+      <p class="film-details__comment-text">${comment.comment}</p>
+        <p class="film-details__comment-info">
+        <span class="film-details__comment-author">${comment.author}</span>
+        <span class="film-details__comment-day">${moment(comment.date).fromNow()}</span>
+        </p>
+        </div>
+        </li>
+        `;
+    }
+    ).join(``);
+    this._element.querySelector(`.film-details__comments-list`).innerHTML = html;
+    this._element.querySelector(`.film-details__comments-title .film-details__comments-count`).innerHTML = comments.length;
+  }
+
+  _processForm(formData, type = 'update') {
     const entry = {
       personalRating: this._personalRating,
       userComments: this._userComments,
@@ -41,7 +81,7 @@ export default class GetPopUp extends Component {
       watchlist: false,
       favorite: false,
     };
-    const filmDetailsMapper = GetPopUp.createMapper(entry);
+    const filmDetailsMapper = GetPopUp.createMapper(entry, type);
     for (let pair of formData.entries()) {
       let [property, value] = pair;
       if (filmDetailsMapper[property]) {
@@ -51,7 +91,7 @@ export default class GetPopUp extends Component {
     return entry;
   }
 
-  static createMapper(target) {
+  static createMapper(target, type = 'update') {
     this._comment = undefined;
     return {
       'watchlist': (value) => (target.watchlist = (value === `on`)),
@@ -59,22 +99,26 @@ export default class GetPopUp extends Component {
       'favorite': (value) => (target.favorite = (value === `on`)),
       'score': (value) => (target.personalRating = +value),
       'comment': (value) => {
-        if (this._comment) {
-          let emoji = this._comment.emotion;
-          this._comment.comment = value;
-          target.userComments.push({author: `Me`, emotion: emoji, comment: value, date: moment().valueOf()});
-        } else {
-          this._comment = {author: `Me`, emotion: undefined, comment: value, date: moment().valueOf()};
+        if (type !== 'delete') {
+          if (this._comment) {
+            let emoji = this._comment.emotion;
+            this._comment.comment = value;
+            target.userComments.push({author: `Me`, emotion: emoji, comment: value, date: moment().valueOf()});
+          } else {
+            this._comment = {author: `Me`, emotion: undefined, comment: value, date: moment().valueOf()};
+          }
         }
       },
       'comment-emoji': (value) => {
-        if (this._comment) {
-          let comment = this._comment.comment;
-          let emoji = value;
-          this._comment.emotion = value;
-          target.userComments.push({author: `Me`, emotion: emoji, comment, date: moment().valueOf()});
-        } else {
-          this._comment = {author: `Me`, emotion: value, comment: undefined, date: moment().valueOf()};
+        if (type !== 'delete') {
+          if (this._comment) {
+            let comment = this._comment.comment;
+            let emoji = value;
+            this._comment.emotion = value;
+            target.userComments.push({author: `Me`, emotion: emoji, comment, date: moment().valueOf()});
+          } else {
+            this._comment = {author: `Me`, emotion: value, comment: undefined, date: moment().valueOf()};
+          }
         }
       }
     };
@@ -90,8 +134,11 @@ export default class GetPopUp extends Component {
   get element() {
     return this._element;
   }
-  _onCloseButtonClick() {
-    return typeof this._onClose === `function` && this._onClose();
+  _onCloseButtonClick(e) {
+    if (e.key === `Escape` || e.target.classList[0] === `film-details__close-btn`) {
+      return typeof this._onClose === `function` && this._onClose();
+    }
+    return null;
   }
 
   _onSubmitClick(evt) {
@@ -115,16 +162,20 @@ export default class GetPopUp extends Component {
   }
 
   bind() {
-    this._element.querySelector(`.film-details__close-btn`)
-      .addEventListener(`click`, this._onCloseButtonClick);
+    this._element.addEventListener(`click`, this._onCloseButtonClick);
+    document.addEventListener(`keydown`, this._onCloseButtonClick);
     this._element.querySelector(`.film-details__comment-input`)
       .addEventListener(`keydown`, this._onSubmitClick);
+    this._element.querySelector(`.film-details__watched-reset`)
+      .addEventListener(`click`, this._deleteLastComment);
   }
   unbind() {
-    this._element.querySelector(`.film-details__close-btn`)
-      .removeEventListener(`click`, this._onCloseButtonClick);
+    this._element.removeEventListener(`click`, this._onCloseButtonClick);
+    document.removeEventListener(`keydown`, this._onCloseButtonClick);
     this._element.querySelector(`.film-details__comment-input`)
       .removeEventListener(`keydown`, this._onSubmitClick);
+    this._element.querySelector(`.film-details__watched-reset`)
+      .removeEventListener(`click`, this._deleteLastComment);
   }
 
 
@@ -205,24 +256,7 @@ export default class GetPopUp extends Component {
     <section class="film-details__comments-wrap">
       <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${this._userComments.length}</span></h3>
 
-      <ul class="film-details__comments-list">
-      ${this._userComments.map((comment) => {
-    return `
-    <li class="film-details__comment">
-        <span class="film-details__comment-emoji">${EmojiMap[comment.emotion]}</span>
-      <div>
-      <p class="film-details__comment-text">${comment.comment}</p>
-      <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${comment.author}</span>
-      <span class="film-details__comment-day">${moment(comment.date).fromNow()}</span>
-      </p>
-      </div>
-      </li>
-      `;
-  }
-  ).join(``)}
-
-      </ul>
+      <ul class="film-details__comments-list"></ul>
 
       <div class="film-details__new-comment">
         <div>
