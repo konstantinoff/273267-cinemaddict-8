@@ -31,6 +31,7 @@ export default class GetPopUp extends Component {
 
 
     this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
+    this._onDeleteComment = this._onDeleteComment.bind(this);
     this._deleteLastComment = this._deleteLastComment.bind(this);
     this._onSubmitClick = this._onSubmitClick.bind(this);
   }
@@ -38,22 +39,55 @@ export default class GetPopUp extends Component {
   render() {
     this._element = Component.createElement(this.template);
     this.bind();
-    this._renderCommentsList();
+    this.renderCommentsList();
     return this._element;
   }
 
+  onSubmitError() {
+    this._element.classList.add(`firm-details--error`);
+    this._element.querySelector(`.film-details__comment-input`)
+      .classList.add(`film-details__comment-input--error`);
+  }
+
+  onSubmitSuccess() {
+    document.querySelector(`.film-details__watched-status`)
+      .innerHTML = `Comment added`;
+    document.querySelector(`.film-details__watched-reset`)
+      .classList.remove(`visually-hidden`);
+  }
+
+  onDeleteSuccess() {
+    document.querySelector(`.film-details__watched-status`)
+      .innerHTML = `Comment deleted`;
+    document.querySelector(`.film-details__watched-reset`)
+      .classList.add(`visually-hidden`);
+  }
+
+  removeComment() {
+    this._userComments.pop();
+  }
+
   _deleteLastComment() {
-    this._userComments.splice(-1, 1);
-    console.log(this._userComments);
-    const formData = new FormData(this._element.querySelector(`.film-details__inner`));
-    const newData = this._processForm(formData, 'delete');
-    if (typeof this._onSubmit === `function`) {
-      this.update(newData);
-      this._onSubmit(newData);
+    const lastComment = (this._userComments[this._userComments.length - 1]);
+    if (lastComment.author === `Me`) {
+      this.removeComment();
+      const formData = new FormData(this._element.querySelector(`.film-details__inner`));
+      const newData = this._processForm(formData, `delete`);
+      if (typeof this._onSubmit === `function`) {
+        this.update(newData);
+        this._onSubmit(newData, `delete`);
+      }
     }
   }
 
-  _renderCommentsList(comments = this._userComments) {
+  _onDeleteComment() {
+    this._deleteLastComment();
+    if (typeof this._onDelete === `function`) {
+      this._onDelete();
+    }
+  }
+
+  renderCommentsList(comments = this._userComments) {
     const html = comments.map((comment) => {
       return `
   <li class="film-details__comment">
@@ -73,7 +107,7 @@ export default class GetPopUp extends Component {
     this._element.querySelector(`.film-details__comments-title .film-details__comments-count`).innerHTML = comments.length;
   }
 
-  _processForm(formData, type = 'update') {
+  _processForm(formData, type = `update`) {
     const entry = {
       personalRating: this._personalRating,
       userComments: this._userComments,
@@ -91,7 +125,23 @@ export default class GetPopUp extends Component {
     return entry;
   }
 
-  static createMapper(target, type = 'update') {
+  disableForm() {
+    this._element.querySelector(`.film-details__comment-input`)
+      .setAttribute(`disabled`, `disabled`);
+  }
+  enableForm() {
+    this._element.querySelector(`.film-details__comment-input`)
+      .removeAttribute(`disabled`);
+    this._element.querySelector(`.film-details__comment-input`)
+      .classList.remove(`film-details__comment-input--error`);
+    this._element.querySelector(`.film-details__add-emoji`).checked = false;
+  }
+
+  clearFrom() {
+    this._element.querySelector(`.film-details__comment-input`).value = ``;
+  }
+
+  static createMapper(target, type = `update`) {
     this._comment = undefined;
     return {
       'watchlist': (value) => (target.watchlist = (value === `on`)),
@@ -99,7 +149,7 @@ export default class GetPopUp extends Component {
       'favorite': (value) => (target.favorite = (value === `on`)),
       'score': (value) => (target.personalRating = +value),
       'comment': (value) => {
-        if (type !== 'delete') {
+        if (type !== `delete`) {
           if (this._comment) {
             let emoji = this._comment.emotion;
             this._comment.comment = value;
@@ -110,7 +160,7 @@ export default class GetPopUp extends Component {
         }
       },
       'comment-emoji': (value) => {
-        if (type !== 'delete') {
+        if (type !== `delete`) {
           if (this._comment) {
             let comment = this._comment.comment;
             let emoji = value;
@@ -142,6 +192,8 @@ export default class GetPopUp extends Component {
   }
 
   _onSubmitClick(evt) {
+    document.querySelector(`.film-details__watched-reset`)
+      .classList.add(`visually-hidden`);
     if (evt.ctrlKey && evt.keyCode === 13) {
       const formData = new FormData(this._element.querySelector(`.film-details__inner`));
       const newData = this._processForm(formData);
@@ -151,7 +203,9 @@ export default class GetPopUp extends Component {
       }
     }
   }
-
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
 
   set onSubmit(fn) {
     this._onSubmit = fn;
@@ -167,7 +221,7 @@ export default class GetPopUp extends Component {
     this._element.querySelector(`.film-details__comment-input`)
       .addEventListener(`keydown`, this._onSubmitClick);
     this._element.querySelector(`.film-details__watched-reset`)
-      .addEventListener(`click`, this._deleteLastComment);
+      .addEventListener(`click`, this._onDeleteComment);
   }
   unbind() {
     this._element.removeEventListener(`click`, this._onCloseButtonClick);
@@ -175,7 +229,7 @@ export default class GetPopUp extends Component {
     this._element.querySelector(`.film-details__comment-input`)
       .removeEventListener(`keydown`, this._onSubmitClick);
     this._element.querySelector(`.film-details__watched-reset`)
-      .removeEventListener(`click`, this._deleteLastComment);
+      .removeEventListener(`click`, this._onDeleteComment);
   }
 
 
@@ -282,8 +336,8 @@ export default class GetPopUp extends Component {
 
     <section class="film-details__user-rating-wrap">
       <div class="film-details__user-rating-controls">
-        <span class="film-details__watched-status ${this._alreadyWatched && `film-details__watched-status--active`}">Already watched</span>
-		  <button class="film-details__watched-reset" type="button">undo</button>
+        <span class="film-details__watched-status"></span>
+		  <button class="film-details__watched-reset visually-hidden" type="button">undo</button>
 		</div>
   
 		<div class="film-details__user-score">

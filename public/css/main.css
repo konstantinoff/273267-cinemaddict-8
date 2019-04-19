@@ -841,3 +841,52 @@ a:hover {
   margin-left: 30px;
   width: 1000px;
 }
+
+.preloader {
+  display: flex;
+  background-color: #000000;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 9999;
+}
+
+.preloader__message {
+  font-size: 25px;
+  color: #ffffff;
+}
+
+.film-details__comment-input--error {
+  outline: 2px solid #ff0000;
+}
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(5px);
+    }
+  }
+
+.firm-details--error {
+  animation: shake 0.6s;
+}
+

@@ -8,6 +8,7 @@ import Search from './search';
 import ExtraFilmCardTemplate from './film-card-extra';
 import footerStatistic from './footer-statistic';
 import profileRating from './profile-rating';
+import {onErrorPreloader, removePreloader} from './preloader';
 
 let cardToRenderPosition = 5;
 let dataToRender;
@@ -21,7 +22,7 @@ const topRatedContainer = document.querySelectorAll(`.films-list--extra .films-l
 const mostCommendedContainer = document.querySelectorAll(`.films-list--extra .films-list__container`)[1];
 
 
-const AUTHORIZATION = `Basic eo0w590ik29889a239j11114`;
+const AUTHORIZATION = `Basic eo0w590ik29889a239j3331`;
 const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
@@ -59,7 +60,11 @@ const render = () => {
       renderFilters(filmData.data);
       footerStatistic(filmData.data);
       profileRating(filmData.data);
+      removePreloader();
       showMoreButton.addEventListener(`click`, onShowMoreButtonClick);
+    })
+    .catch(() => {
+      onErrorPreloader();
     });
 
   const onShowMoreButtonClick = () => showMoreCards(dataToRender);
@@ -110,12 +115,14 @@ const render = () => {
       };
     }
     const statistic = new Statistic(filmData.data);
-    statistic.bind();
+    statistic.render();
     statistic.onStatisticRender = () => {
-      filmsContainer.innerHTML = ``;
+      statistic.unrender();
       statistic.render();
+      filmsContainer.innerHTML = ``;
       filmsContainer.appendChild(statistic.element);
       statistic.statisticDraw();
+      showMoreButton.classList.add(`visually-hidden`);
     };
   };
   const renderCards = (cards) => {
@@ -164,24 +171,34 @@ const render = () => {
       };
 
 
-      popUpTemplate.onSubmit = (newData) => {
+      popUpTemplate.onSubmit = (newData, type = `add`) => {
         Object.assign(card, newData);
-        console.log('disabled');
+        popUpTemplate.disableForm();
         api.updateCard({id: card.id, data: card.toRAW()})
           .then((data) => {
-            popUpTemplate._renderCommentsList(data.userComments);
+            popUpTemplate.renderCommentsList(data.userComments);
             let oldCard = cardTemplate.element;
             cardTemplate.render();
             cardTemplate.bind();
             filmsContainer.replaceChild(cardTemplate.element, oldCard);
+            popUpTemplate.clearFrom();
+            popUpTemplate.enableForm();
+            if (type === `add`) {
+              popUpTemplate.onSubmitSuccess();
+            }
           })
-          .finally(() => {
-            console.log('undisabled');
-        });
+          .catch(() => {
+            popUpTemplate.removeComment();
+            popUpTemplate.enableForm();
+            popUpTemplate.onSubmitError();
+          });
       };
       popUpTemplate.onClose = () => {
         popUpTemplate.unrender();
         isOpenedPopUp = false;
+      };
+      popUpTemplate.onDelete = () => {
+        popUpTemplate.onDeleteSuccess();
       };
     }
   };
@@ -209,7 +226,7 @@ const render = () => {
         Object.assign(card, newData);
         api.updateCard({id: card.id, data: card.toRAW()})
           .then((store) => {
-            popUpTemplate._renderCommentsList(store.userComments);
+            popUpTemplate.renderCommentsList(store.userComments);
             let oldCard = cardTemplate.element;
             cardTemplate.render();
             cardTemplate.bind();
@@ -239,7 +256,7 @@ const render = () => {
         Object.assign(card, newData);
         api.updateCard({id: card.id, data: card.toRAW()})
           .then((store) => {
-            popUpTemplate._renderCommentsList(store.userComments);
+            popUpTemplate.renderCommentsList(store.userComments);
             let oldCard = cardTemplate.element;
             cardTemplate.render();
             cardTemplate.bind();

@@ -31,17 +31,6 @@ export default class API {
       .then(ModelCards.parseCards);
   }
 
-  createCard({card}) {
-    return this._load({
-      url: `cards`,
-      method: Method.POST,
-      body: JSON.stringify(card),
-      headers: new Headers({'Content-Type': `application/json`})
-    })
-      .then(toJSON)
-      .then(ModelCards.parseCard);
-  }
-
   updateCard({id, data}) {
     return this._load({
       url: `movies/${id}`,
@@ -52,9 +41,6 @@ export default class API {
       .then(toJSON)
       .then(ModelCards.parseCard);
   }
-  deleteCard({id}) {
-    return this._load({url: `cards/${id}`, method: Method.PUT});
-  }
 
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
@@ -64,7 +50,6 @@ export default class API {
     return fetch(`${this._endPoint}/${url}`, {method, body, headers})
       .then(checkStatus)
       .catch((err) => {
-        console.error(`fetch error: ${err}`);
         throw err;
       });
   }
