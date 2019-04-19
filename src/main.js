@@ -224,35 +224,20 @@ const render = () => {
         cardTemplate.unbind();
       };
 
-      popUpTemplate.onSubmit = (newData, type = `add`) => {
+      popUpTemplate.onSubmit = (newData) => {
         Object.assign(card, newData);
-        popUpTemplate.disableForm();
         api.updateCard({id: card.id, data: card.toRAW()})
           .then((store) => {
             popUpTemplate.renderCommentsList(store.userComments);
             let oldCard = cardTemplate.element;
             cardTemplate.render();
             cardTemplate.bind();
-            topRatedContainer.replaceChild(cardTemplate.element, oldCard);
-            popUpTemplate.clearFrom();
-            popUpTemplate.enableForm();
-            if (type === `add`) {
-              popUpTemplate.onSubmitSuccess();
-            }
-          })
-          .catch(() => {
-            popUpTemplate.removeComment();
-            popUpTemplate.enableForm();
-            popUpTemplate.onSubmitError();
+            filmsContainer.replaceChild(cardTemplate.element, oldCard);
           });
       };
       popUpTemplate.onClose = () => {
-        cardTemplate.bind();
         popUpTemplate.unrender();
         isOpenedPopUp = false;
-      };
-      popUpTemplate.onDelete = () => {
-        popUpTemplate.onDeleteSuccess();
       };
     }
 
@@ -269,35 +254,20 @@ const render = () => {
         cardTemplate.unbind();
       };
 
-      popUpTemplate.onSubmit = (newData, type = `add`) => {
+      popUpTemplate.onSubmit = (newData) => {
         Object.assign(card, newData);
-        popUpTemplate.disableForm();
         api.updateCard({id: card.id, data: card.toRAW()})
           .then((store) => {
             popUpTemplate.renderCommentsList(store.userComments);
             let oldCard = cardTemplate.element;
             cardTemplate.render();
             cardTemplate.bind();
-            mostCommendedContainer.replaceChild(cardTemplate.element, oldCard);
-            popUpTemplate.clearFrom();
-            popUpTemplate.enableForm();
-            if (type === `add`) {
-              popUpTemplate.onSubmitSuccess();
-            }
-          })
-          .catch(() => {
-            popUpTemplate.removeComment();
-            popUpTemplate.enableForm();
-            popUpTemplate.onSubmitError();
+            filmsContainer.replaceChild(cardTemplate.element, oldCard);
           });
       };
       popUpTemplate.onClose = () => {
-        cardTemplate.bind();
         popUpTemplate.unrender();
         isOpenedPopUp = false;
-      };
-      popUpTemplate.onDelete = () => {
-        popUpTemplate.onDeleteSuccess();
       };
     }
   };
