@@ -135,6 +135,7 @@ const render = () => {
       cardTemplate.render();
       filmsContainer.appendChild(cardTemplate.element);
       cardTemplate.onClick = () => {
+        cardTemplate.unbind();
         popUpTemplate.render();
         if (isOpenedPopUp) {
           body.replaceChild(popUpTemplate.element, isOpenedPopUp);
@@ -194,6 +195,7 @@ const render = () => {
           });
       };
       popUpTemplate.onClose = () => {
+        cardTemplate.bind();
         popUpTemplate.unrender();
         isOpenedPopUp = false;
       };
