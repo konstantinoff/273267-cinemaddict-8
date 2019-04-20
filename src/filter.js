@@ -13,6 +13,10 @@ export default class Filter extends Component {
     this._onFilter = fn;
   }
 
+  get template() {
+    return `<a href="#" class="main-navigation__item">${this._filterName} ${this._filterName !== `All movies` ? (`<span class="main-navigation__item-count">${this._filterAmount}</span>`) : ``}</a>`;
+  }
+
   _onFilterClick(e) {
     e.preventDefault();
     return typeof this._onFilter === `function` && this._onFilter();
@@ -22,12 +26,8 @@ export default class Filter extends Component {
     this._element.addEventListener(`click`, this._onFilterClick);
   }
 
+
   unbind() {
     this._element.removeEventListener(`click`, this._onFilterClick);
-  }
-
-
-  get template() {
-    return `<a href="#" class="main-navigation__item">${this._filterName} ${this._filterName !== `All movies` ? (`<span class="main-navigation__item-count">${this._filterAmount}</span>`) : ``}</a>`;
   }
 }

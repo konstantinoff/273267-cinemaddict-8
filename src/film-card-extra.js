@@ -1,7 +1,7 @@
 import Component from './component';
 import moment from 'moment';
 
-export default class ExtraGetFilmCard extends Component {
+export default class ExtraFilmCard extends Component {
   constructor({title, description, runtime, rating, filmDate, genre, poster, userComments}) {
     super();
     this._title = title;

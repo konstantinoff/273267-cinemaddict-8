@@ -22,7 +22,7 @@ export default class ModelCard {
     this.writers = data.film_info[`writers`];
   }
 
-  toRAW() {
+  toRaw() {
     return {
       'id': this.id,
       'film_info': {

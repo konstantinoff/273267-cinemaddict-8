@@ -22,6 +22,11 @@ export default class Statistic extends Component {
     return this._element;
   }
 
+  set onStatisticRender(fn) {
+    this._onStatisticRender = fn;
+  }
+
+
   filterPeriod() {
     let filtered;
     switch (this._currentPeriod) {
@@ -59,7 +64,6 @@ export default class Statistic extends Component {
       duration: filtered.reduce((acc, film) => acc + film.runtime, 0)
     };
   }
-
 
   statisticDraw() {
     this._element.querySelector(`.statistic__chart-wrap`)
@@ -124,10 +128,6 @@ export default class Statistic extends Component {
       }
     });
     return myChart;
-  }
-
-  set onStatisticRender(fn) {
-    this._onStatisticRender = fn;
   }
 
   _statisticTextRender() {

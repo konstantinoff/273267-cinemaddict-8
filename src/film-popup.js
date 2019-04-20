@@ -7,7 +7,7 @@ const EmojiMap = {
   'sleeping': `😴`
 };
 
-export default class GetPopUp extends Component {
+export default class PopUp extends Component {
   constructor({title, description, runtime, rating, ageRating, filmDate, alternativeTitle, genre, poster, actors, director, writers, country, userComments, personalRating, watchlist, alreadyWatched, favorite}) {
     super();
     this._watchlist = watchlist;
@@ -115,7 +115,7 @@ export default class GetPopUp extends Component {
       watchlist: false,
       favorite: false,
     };
-    const filmDetailsMapper = GetPopUp.createMapper(entry, type);
+    const filmDetailsMapper = PopUp.createMapper(entry, type);
     for (let pair of formData.entries()) {
       let [property, value] = pair;
       if (filmDetailsMapper[property]) {
@@ -192,10 +192,9 @@ export default class GetPopUp extends Component {
   }
 
   _onSubmitClick(evt) {
-    document.querySelector(`.film-details__watched-reset`)
-      .classList.add(`visually-hidden`);
+    const popUpForm = this._element.querySelector(`.film-details__inner`);
     if (evt.ctrlKey && evt.keyCode === 13) {
-      const formData = new FormData(this._element.querySelector(`.film-details__inner`));
+      const formData = new FormData(popUpForm);
       const newData = this._processForm(formData);
       if (typeof this._onSubmit === `function`) {
         this.update(newData);

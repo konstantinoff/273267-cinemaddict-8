@@ -1,13 +1,17 @@
+const NOVICE_FILM_RANGE = 10;
+const FAN_FILM_RANGE = 20;
+
+
 export default (films) => {
   const WatchedFilmsAmount = films.filter((it) => it.alreadyWatched === true).length;
   const profileRating = () => {
     switch (true) {
-      case (WatchedFilmsAmount <= 10):
+      case (WatchedFilmsAmount <= NOVICE_FILM_RANGE):
         return `novice`;
-      case (WatchedFilmsAmount <= 20):
+      case (WatchedFilmsAmount <= FAN_FILM_RANGE):
         return `fan`;
 
-      case (WatchedFilmsAmount > 20):
+      case (WatchedFilmsAmount > FAN_FILM_RANGE):
         return `movie buff`;
       default:
         return `Show adept`;

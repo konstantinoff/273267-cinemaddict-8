@@ -1,30 +1,32 @@
 import filmData from "./data";
 import FilmCardTemplate from "./film-card";
-import GetFilmPopUp from "./film-popup";
+import FilmPopUp from "./film-popup";
 import Filter from './filter';
 import Statistic from './statistic';
-import API from './api';
+import Api from './api';
 import Search from './search';
 import ExtraFilmCardTemplate from './film-card-extra';
 import footerStatistic from './footer-statistic';
 import profileRating from './profile-rating';
 import {onErrorPreloader, removePreloader} from './preloader';
 
-let cardToRenderPosition = 5;
-let dataToRender;
-let isOpenedPopUp = false;
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
+const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
+const CARD_RENDER_INCREMENT = 5;
 
+let cardToRenderPosition = CARD_RENDER_INCREMENT;
+let dataToRender;
+
+let isOpenedPopUp = false;
+const api = new Api({endPoint: END_POINT, authorization: AUTHORIZATION});
 const showMoreButton = document.querySelector(`.films-list__show-more`);
 const navBar = document.querySelector(`.main-navigation`);
 const searchForm = document.querySelector(`.header__search`);
 const filmsContainer = document.querySelector(`.films-list__container`);
+
+
 const topRatedContainer = document.querySelectorAll(`.films-list--extra .films-list__container`)[0];
 const mostCommendedContainer = document.querySelectorAll(`.films-list--extra .films-list__container`)[1];
-
-
-const AUTHORIZATION = `Basic eo0w590ik29889a239j3331`;
-const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
-const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 const body = document.querySelector(`body`);
 
@@ -75,7 +77,7 @@ const render = () => {
       showMoreButton.removeEventListener(`click`, onShowMoreButtonClick);
       showMoreButton.classList.add(`visually-hidden`);
     }
-    cardToRenderPosition += 5;
+    cardToRenderPosition += CARD_RENDER_INCREMENT;
   };
 
   const renderSearch = () => {
@@ -88,7 +90,7 @@ const render = () => {
         const searchResult = getSearchedData(filmData.data, searchValue);
         renderCards(searchResult);
       } else {
-        cardToRenderPosition = 5;
+        cardToRenderPosition = CARD_RENDER_INCREMENT;
         showMoreCards(filmData.data);
       }
     };
@@ -110,7 +112,7 @@ const render = () => {
         dataToRender = filteredCards;
         showMoreButton.removeEventListener(`click`, onShowMoreButtonClick);
         showMoreButton.addEventListener(`click`, onShowMoreButtonClick);
-        cardToRenderPosition = 5;
+        cardToRenderPosition = CARD_RENDER_INCREMENT;
         showMoreCards(dataToRender);
       };
     }
@@ -129,7 +131,7 @@ const render = () => {
     filmsContainer.innerHTML = ``;
     for (let card of cards) {
       const cardTemplate = new FilmCardTemplate(card);
-      const popUpTemplate = new GetFilmPopUp(card);
+      const popUpTemplate = new FilmPopUp(card);
 
 
       cardTemplate.render();
@@ -147,7 +149,7 @@ const render = () => {
 
       cardTemplate.onAddToWatchList = () => {
         card.watchlist = !card.watchlist;
-        api.updateCard({id: card.id, data: card.toRAW()})
+        api.updateCard({id: card.id, data: card.toRaw()})
           .then((newData) => {
             popUpTemplate.update(newData);
             renderFilters(filmData.data);
@@ -156,7 +158,7 @@ const render = () => {
 
       cardTemplate.onMarkAsWatched = () => {
         card.alreadyWatched = !card.alreadyWatched;
-        api.updateCard({id: card.id, data: card.toRAW()})
+        api.updateCard({id: card.id, data: card.toRaw()})
           .then((newData) => {
             popUpTemplate.update(newData);
             renderFilters(filmData.data);
@@ -164,7 +166,7 @@ const render = () => {
       };
       cardTemplate.onAddToFavorite = () => {
         card.favorite = !card.favorite;
-        api.updateCard({id: card.id, data: card.toRAW()})
+        api.updateCard({id: card.id, data: card.toRaw()})
           .then((newData) => {
             popUpTemplate.update(newData);
             renderFilters(filmData.data);
@@ -175,7 +177,7 @@ const render = () => {
       popUpTemplate.onSubmit = (newData, type = `add`) => {
         Object.assign(card, newData);
         popUpTemplate.disableForm();
-        api.updateCard({id: card.id, data: card.toRAW()})
+        api.updateCard({id: card.id, data: card.toRaw()})
           .then((data) => {
             popUpTemplate.renderCommentsList(data.userComments);
             let oldCard = cardTemplate.element;
@@ -213,7 +215,7 @@ const render = () => {
 
     for (let card of topRated) {
       const cardTemplate = new ExtraFilmCardTemplate(card);
-      const popUpTemplate = new GetFilmPopUp(card);
+      const popUpTemplate = new FilmPopUp(card);
 
 
       cardTemplate.render();
@@ -227,7 +229,7 @@ const render = () => {
       popUpTemplate.onSubmit = (newData, type = `add`) => {
         Object.assign(card, newData);
         popUpTemplate.disableForm();
-        api.updateCard({id: card.id, data: card.toRAW()})
+        api.updateCard({id: card.id, data: card.toRaw()})
           .then((store) => {
             popUpTemplate.renderCommentsList(store.userComments);
             let oldCard = cardTemplate.element;
@@ -258,7 +260,7 @@ const render = () => {
 
     for (let card of mostCommended) {
       const cardTemplate = new ExtraFilmCardTemplate(card);
-      const popUpTemplate = new GetFilmPopUp(card);
+      const popUpTemplate = new FilmPopUp(card);
 
 
       cardTemplate.render();
@@ -272,7 +274,7 @@ const render = () => {
       popUpTemplate.onSubmit = (newData, type = `add`) => {
         Object.assign(card, newData);
         popUpTemplate.disableForm();
-        api.updateCard({id: card.id, data: card.toRAW()})
+        api.updateCard({id: card.id, data: card.toRaw()})
           .then((store) => {
             popUpTemplate.renderCommentsList(store.userComments);
             let oldCard = cardTemplate.element;

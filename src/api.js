@@ -7,19 +7,22 @@ const Method = {
   DELETE: `DELETE`
 };
 
-const toJSON = (response) => {
+const OK_STATUS = 200;
+const OK_STATUS_RANGE = 100;
+
+const toJson = (response) => {
   return response.json();
 };
 
 const checkStatus = (response) => {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.status >= OK_STATUS && response.status < OK_STATUS + OK_STATUS_RANGE) {
     return response;
   } else {
     throw new Error(`${response.status}: ${response.statusText}`);
   }
 };
 
-export default class API {
+export default class Api {
   constructor({endPoint, authorization}) {
     this._endPoint = endPoint;
     this._autorization = authorization;
@@ -27,7 +30,7 @@ export default class API {
 
   getCards() {
     return this._load({url: `movies`})
-      .then(toJSON)
+      .then(toJson)
       .then(ModelCards.parseCards);
   }
 
@@ -38,7 +41,7 @@ export default class API {
       body: JSON.stringify(data),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then(toJSON)
+      .then(toJson)
       .then(ModelCards.parseCard);
   }
 
