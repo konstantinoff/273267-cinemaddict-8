@@ -2,7 +2,7 @@ import Component from './component';
 import moment from 'moment';
 
 export default class FilmCard extends Component {
-  constructor({title, description, runtime, rating, filmDate, genre, poster, userComments, alreadyWatched, favorite, watchlist, personalRating}) {
+  constructor({title, description, runtime, rating, filmDate, genre, poster, userComments}) {
     super();
     this._title = title;
     this._description = description;
