@@ -15,15 +15,15 @@ export default class Statistic extends Component {
     this._drawFilteredStatistic = this._drawFilteredStatistic.bind(this);
   }
 
+  set onStatisticRender(fn) {
+    this._onStatisticRender = fn;
+  }
+
   render() {
     this._element = Component.createElement(this.template);
     this._statisticTextRender();
     this.bind();
     return this._element;
-  }
-
-  set onStatisticRender(fn) {
-    this._onStatisticRender = fn;
   }
 
 

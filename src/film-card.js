@@ -12,10 +12,6 @@ export default class FilmCard extends Component {
     this._genre = genre;
     this._poster = poster;
     this._userComments = userComments;
-    this._personalRating = personalRating;
-    this._alreadyWatched = alreadyWatched;
-    this._watchlist = watchlist;
-    this.favorite = favorite;
 
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
     this._onAddToWatchListButtonClick = this._onAddToWatchListButtonClick.bind(this);
@@ -56,13 +52,6 @@ export default class FilmCard extends Component {
     this._onAddToFavorite = fn;
   }
 
-  update({userComments, personalRating, alreadyWatched, watchlist, favorite}) {
-    this._watchlist = watchlist;
-    this._favorite = favorite;
-    this._alreadyWatched = alreadyWatched;
-    this._personalRating = personalRating;
-    this._userComments = userComments;
-  }
 
   bind() {
     this._element.querySelector(`.film-card__comments`)

@@ -1,10 +1,11 @@
 const NOVICE_FILM_RANGE = 10;
-const FAN_FILM_RANGE = 20;
+const FAN_FILM_RANGE = 19;
+const profileRating = document.querySelector(`.profile__rating`);
 
 
 export default (films) => {
   const WatchedFilmsAmount = films.filter((it) => it.alreadyWatched === true).length;
-  const profileRating = () => {
+  const getProfileRating = () => {
     switch (true) {
       case (WatchedFilmsAmount <= NOVICE_FILM_RANGE):
         return `novice`;
@@ -17,9 +18,6 @@ export default (films) => {
         return `Show adept`;
     }
   };
-
-  const i = profileRating();
-  document.querySelector(`.profile__rating`)
-    .insertAdjacentText(`afterbegin`, `${i}`);
+  profileRating.insertAdjacentText(`afterbegin`, `${getProfileRating()}`);
 };
 
